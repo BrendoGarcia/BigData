@@ -8,8 +8,8 @@ Este sistema utiliza Machine Learning para prever quais escolas terão alta taxa
 
 ```
 ProjetoDash/
-├── DadosBrutos/                    # Dados originais
-│   ├── ideb/
+├── DadosBrutos/                    # Dados originais a base de dados IDEB e grande demais para ser colocada no repositório
+│   ├── ideb/                       # O link para obter os dados está na pasta ideb contendo um link do driver de um arquivo csv
 │   ├── nivel_socioeconomico/
 │   └── taxa_transicao/
 ├── data_preparation.py             # Script de preparação dos dados
