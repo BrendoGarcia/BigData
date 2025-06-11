@@ -57,13 +57,13 @@ st.markdown("---")
 # Carregar dados e modelo
 @st.cache_data
 def load_data():
-    df = pd.read_csv("processed_data.csv")
+    df = pd.read_csv("https://github.com/BrendoGarcia/BigData/blob/main/processed_data.csv")
     return df
 
 @st.cache_resource
 def load_model():
-    model = joblib.load("evasion_model.joblib")
-    columns = joblib.load("feature_columns.pkl")
+    model = joblib.load("https://github.com/BrendoGarcia/BigData/blob/main/evasion_model.joblib")
+    columns = joblib.load("https://github.com/BrendoGarcia/BigData/blob/main/feature_columns.pkl")
     return model,columns
 # Carregar dados
 df = load_data()
