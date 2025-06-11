@@ -81,7 +81,11 @@ page = st.sidebar.selectbox("Escolha uma página:",
 
 if page == "Dashboard Principal":
     st.header("📊 Dashboard Principal")
-    
+    st.write("Colunas no DataFrame:")
+    st.write(df.columns.tolist())
+    st.write("Primeiras linhas do DataFrame:")
+    st.write(df.head())
+
     # Métricas principais
     col1, col2, col3, col4 = st.columns(4)
     
