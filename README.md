@@ -162,19 +162,6 @@ prediction = model.predict(data_encoded)
 probability = model.predict_proba(data_encoded)[:, 1]
 ```
 
-## Limitações
-
-1. **Dados temporais desalinhados** (IDEB 2021, NSE 2015)
-2. **Agregação regional** da taxa de evasão
-3. **Possível overfitting** (performance de 100%)
-
-## Recomendações
-
-1. Atualizar dados de nível socioeconômico
-2. Incluir dados de infraestrutura escolar
-3. Validar com dados externos
-4. Implementar validação cruzada temporal
-
 ## Suporte
 
 Para dúvidas ou problemas:
