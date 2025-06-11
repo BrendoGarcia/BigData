@@ -58,7 +58,7 @@ st.title("🎓 Preditor de Evasão Escolar no Ensino Médio")
 st.markdown("---")
 
 # Carregar dados e modelo
-@st.cache_data
+@st.cache_data(show_spinner=True)
 def load_data():
     iddriver = "1hjtzyHP72KaBLs5HiQH4seLEZ_7blhh7"
     urldriver = f"https://drive.google.com/uc?id={iddriver}"
