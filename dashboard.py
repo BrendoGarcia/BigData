@@ -60,7 +60,7 @@ st.markdown("---")
 @st.cache_data
 def load_data():
     iddriver = "1hjtzyHP72KaBLs5HiQH4seLEZ_7blhh7"
-    urldriver = f"https://drive.google.com/uc?id={iddriver}
+    urldriver = f"https://drive.google.com/uc?id={iddriver}"
     df = pd.read_csv(urldriver)
     return df
 
