@@ -13,7 +13,9 @@ import os
 
 
 def salvar_grafico(fig, filename):
-    pio.write_image(fig, filename, format='png', width=800, height=500)
+    temp_path = os.path.join("/tmp", filename)
+    pio.write_image(fig, temp_path, format='png', width=800, height=500)
+    return temp_path
 
 def gerar_pdf(df, fig1, fig2):
     salvar_grafico(fig1, "grafico1.png")
