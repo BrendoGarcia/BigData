@@ -60,12 +60,8 @@ st.markdown("---")
 # Carregar dados e modelo
 @st.cache_data(show_spinner=True)
 def load_data():
-    iddriver = "1hjtzyHP72KaBLs5HiQH4seLEZ_7blhh7"
-    urldriver = f"https://drive.google.com/uc?id={iddriver}"
-    output = "/tmp/processed_data.csv"
-    gdown.download(urldriver, output, quiet=False)
     st.write("Carregando CSV em memória...")
-    df = pd.read_csv(output)
+    df = pd.read_csv("https://storage.googleapis.com/banco-dados-reserva/processed_data.csv")
     return df
 
 def load_model():
