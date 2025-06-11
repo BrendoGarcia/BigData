@@ -52,11 +52,11 @@ def train_model(data_path):
     print(f"Recall: {recall:.4f}")
     print(f"F1-Score: {f1:.4f}")
 
-    model_path = "BigData/evasion_model.joblib"
+    model_path = "C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/evasion_model.joblib"
     joblib.dump(model, model_path)
     print(f"Modelo salvo em {model_path}")
 
-    columns_path = "BigData/feature_columns.pkl"
+    columns_path = "C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/feature_columns.pkl"
     joblib.dump(X.columns.tolist(), columns_path)
     print(f"Colunas salvas em {columns_path}")
 
@@ -64,5 +64,5 @@ def train_model(data_path):
 
 
 if __name__ == "__main__":
-    processed_data_path = "BigData/processed_data.csv"
+    processed_data_path = "C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/processed_data.csv"
     train_model(processed_data_path)
