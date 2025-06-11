@@ -59,7 +59,9 @@ st.markdown("---")
 # Carregar dados e modelo
 @st.cache_data
 def load_data():
-    df = pd.read_csv("https://media.githubusercontent.com/media/BrendoGarcia/BigData/main/processed_data.csv")
+    iddriver = "1hjtzyHP72KaBLs5HiQH4seLEZ_7blhh7"
+    urldriver = f"https://drive.google.com/uc?id={iddriver}
+    df = pd.read_csv(urldriver)
     return df
 
 def load_model():
