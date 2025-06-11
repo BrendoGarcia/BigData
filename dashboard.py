@@ -62,8 +62,8 @@ def load_data():
 
 @st.cache_resource
 def load_model():
-    model = joblib.load("https://github.com/BrendoGarcia/BigData/raw/main/evasion_model.joblib")
-    columns = joblib.load("https://github.com/BrendoGarcia/BigData/raw/main/feature_columns.pkl")
+    model = joblib.load("evasion_model.joblib")
+    columns = joblib.load("feature_columns.pkl")
     return model,columns
 # Carregar dados
 df = load_data()
