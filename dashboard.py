@@ -57,7 +57,7 @@ st.markdown("---")
 # Carregar dados e modelo
 @st.cache_data
 def load_data():
-    df = pd.read_csv("https://raw.githubusercontent.com/BrendoGarcia/BigData/main/processed_data.csv")
+    df = pd.read_csv("https://drive.google.com/file/d/1hjtzyHP72KaBLs5HiQH4seLEZ_7blhh7/view") #https://raw.githubusercontent.com/BrendoGarcia/BigData/main/processed_data.csv
     return df
 
 @st.cache_resource
