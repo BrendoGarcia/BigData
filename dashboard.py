@@ -63,7 +63,7 @@ def load_data():
     iddriver = "1hjtzyHP72KaBLs5HiQH4seLEZ_7blhh7"
     urldriver = f"https://drive.google.com/uc?id={iddriver}"
     output = "/tmp/processed_data.csv"
-    gdown.download(url, output, quiet=False)
+    gdown.download(urldriver, output, quiet=False)
     df = pd.read_csv(output)
     return df
 
