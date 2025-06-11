@@ -12,8 +12,8 @@ def test_model_performance():
     print("=== TESTE DE PERFORMANCE DO MODELO ===")
     
     # Carregar dados
-    df = pd.read_csv("C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/processed_data.csv")
-    model = joblib.load("C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/evasion_model.joblib")
+    df = pd.read_csv("BigData/processed_data.csv")
+    model = joblib.load("BigData/evasion_model.joblib")
     
     # Preparar dados para teste
     X = df.drop(columns=["id_escola", "alta_evasao"])
@@ -52,7 +52,7 @@ def test_data_quality():
     """Testa a qualidade dos dados processados"""
     print("\n=== TESTE DE QUALIDADE DOS DADOS ===")
     
-    df = pd.read_csv("C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/processed_data.csv")
+    df = pd.read_csv("BigData/processed_data.csv")
     
     print(f"Número total de registros: {len(df)}")
     print(f"Número de colunas: {len(df.columns)}")
@@ -85,11 +85,11 @@ def test_dashboard_functionality():
         print("✓ Streamlit importado com sucesso")
         
         # Verificar se os dados podem ser carregados
-        df = pd.read_csv("C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/processed_data.csv")
+        df = pd.read_csv("BigData/processed_data.csv")
         print("✓ Dados carregados com sucesso")
         
         # Verificar se o modelo pode ser carregado
-        model = joblib.load("C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash/evasion_model.joblib")
+        model = joblib.load("BigData/evasion_model.joblib")
         print("✓ Modelo carregado com sucesso")
         
         # Testar uma predição simples
