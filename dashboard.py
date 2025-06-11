@@ -63,22 +63,10 @@ def load_data():
     return df
 
 def load_model():
-    st.write("🔍 Iniciando carregamento do modelo...")
-    import os
-    st.write("📁 Arquivos disponíveis:", os.listdir())
-    st.write("📍 Caminho atual:", os.getcwd())
-
     model_path = "evasion_model.joblib"
     columns_path = "feature_columns.pkl"
-
-    if not os.path.exists(model_path):
-        st.error(f"❌ Modelo não encontrado: {model_path}")
-    if not os.path.exists(columns_path):
-        st.error(f"❌ Colunas não encontradas: {columns_path}")
-
     model = joblib.load(model_path)
     columns = joblib.load(columns_path)
-    st.write("✅ Modelo e colunas carregados com sucesso.")
     return model, columns
 
 # Carregar dados
