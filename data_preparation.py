@@ -77,7 +77,7 @@ def preprocess_data(df_ideb, df_nse, df_taxa_transicao):
     return df_merged
 
 if __name__ == "__main__":
-    base_path = "C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash"
+    base_path = "/BigData"
     df_ideb, df_nse, df_taxa_transicao = load_data(base_path)
     df_final = preprocess_data(df_ideb, df_nse, df_taxa_transicao)
     print(df_final.head())
