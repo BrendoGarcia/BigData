@@ -22,12 +22,12 @@ st.markdown("---")
 # Carregar dados e modelo
 @st.cache_data
 def load_data():
-    df = pd.read_csv("/BigData/processed_data.csv")
+    df = pd.read_csv("/processed_data.csv")
     return df
 
 @st.cache_resource
 def load_model():
-    model = joblib.load("/BigData/evasion_model.joblib")
+    model = joblib.load("/evasion_model.joblib")
     return model
 
 # Carregar dados
