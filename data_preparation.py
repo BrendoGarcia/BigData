@@ -30,21 +30,17 @@ def preprocess_data(df_ideb, df_nse, df_taxa_transicao):
     df_taxa_transicao = standardize_rede(df_taxa_transicao)
 
     # IDEB
-    df_ideb_filtered = df_ideb.copy()
-    df_ideb_filtered = df_ideb_filtered[[
-    "id_escola", "id_escola_nome", "sigla_uf", "sigla_uf_nome",
-    "id_municipio", "id_municipio_nome","rede",
-    "id_escola_latitude", "id_escola_longitude", "ideb", "taxa_aprovacao", "indicador_rendimento",
-    "nota_saeb_matematica", "nota_saeb_lingua_portuguesa", "nota_saeb_media_padronizada"]]
+    df_ideb_filtered = df_ideb[df_ideb["ano"] == 2021].copy()
+    df_ideb_filtered = df_ideb_filtered[["id_escola", "ideb", "sigla_uf", "rede"]]
 
     # Nível Socioeconômico - Usando ano de 2015, pois é o mais recente disponível
-    df_nse_filtered = df_nse.copy()
-    df_nse_filtered = df_nse_filtered[["id_escola","inse_quantidade_alunos","valor_inse","inse_classificacao_2014","inse_classificacao_2015"]]
+    df_nse_filtered = df_nse[df_nse["ano"] == 2015].copy()
+    df_nse_filtered = df_nse_filtered[["id_escola", "valor_inse"]]
     df_nse_filtered.rename(columns={"valor_inse": "nivel_socioeconomico"}, inplace=True)
 
     # Taxa de Transição (Evasão Histórica) - Agregando por UF e rede
-    df_taxa_transicao_filtered = df_taxa_transicao.copy()
-    df_taxa_transicao_filtered = df_taxa_transicao_filtered[["sigla_uf", "rede", "taxa_evasao_em", "localizacao","taxa_promocao_em","taxa_promocao_em_1_ano","taxa_promocao_em_2_ano","taxa_promocao_em_3_ano","taxa_repetencia_em","taxa_repetencia_em_1_ano","taxa_repetencia_em_2_ano","taxa_repetencia_em_3_ano","taxa_evasao_em_1_ano","taxa_evasao_em_2_ano","taxa_evasao_em_3_ano"]]
+    df_taxa_transicao_filtered = df_taxa_transicao[df_taxa_transicao["ano"] == 2021].copy()
+    df_taxa_transicao_filtered = df_taxa_transicao_filtered[["sigla_uf", "rede", "taxa_evasao_em"]]
     df_taxa_transicao_filtered.rename(columns={"taxa_evasao_em": "taxa_evasao_historica"}, inplace=True)
     df_taxa_transicao_filtered = df_taxa_transicao_filtered.groupby(["sigla_uf", "rede"])["taxa_evasao_historica"].mean().reset_index()
 
@@ -77,7 +73,7 @@ def preprocess_data(df_ideb, df_nse, df_taxa_transicao):
     return df_merged
 
 if __name__ == "__main__":
-    base_path = "C:/Users/Sara/Downloads/ProjetoDash/ProjetoDash"
+    base_path = "/home/ubuntu/ProjetoDash/ProjetoDash"
     df_ideb, df_nse, df_taxa_transicao = load_data(base_path)
     df_final = preprocess_data(df_ideb, df_nse, df_taxa_transicao)
     print(df_final.head())

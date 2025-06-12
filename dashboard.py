@@ -6,43 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import joblib
 import numpy as np
-from fpdf import FPDF
-import plotly.io as pio
-import os
-
-
-
-def salvar_grafico(fig, filename):
-    temp_path = os.path.join("/tmp", filename)
-    pio.write_image(fig, temp_path, format='png', width=800, height=500)
-    return temp_path
-
-def gerar_pdf(df, fig1, fig2):
-    salvar_grafico(fig1, "grafico1.png")
-    salvar_grafico(fig2, "grafico2.png")
-
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_font("Arial", size=12)
-    pdf.cell(200, 10, txt="Relatório de Evasão Escolar", ln=True, align="C")
-
-    # Adicionar gráficos
-    pdf.ln(10)
-    pdf.image("grafico1.png", x=10, y=30, w=180)
-    pdf.ln(80)
-    pdf.image("grafico2.png", x=10, y=120, w=180)
-
-    # Adicionar tabela com dados (exemplo limitado)
-    pdf.ln(90)
-    pdf.set_font("Arial", size=10)
-    pdf.cell(200, 10, txt="Exemplo de Dados:", ln=True)
-    for i, row in df.head(10).iterrows():
-        linha = f"{row['sigla_uf']}, {row['rede']}, IDEB: {row['ideb']:.2f}, NSE: {row['nivel_socioeconomico']:.2f}"
-        pdf.cell(200, 10, txt=linha, ln=True)
-
-    pdf.output("relatorio_evasao.pdf")
-
-
 
 # Configuração da página
 st.set_page_config(
@@ -57,22 +20,19 @@ st.title("🎓 Preditor de Evasão Escolar no Ensino Médio")
 st.markdown("---")
 
 # Carregar dados e modelo
-@st.cache_data(show_spinner=True)
+@st.cache_data
 def load_data():
-    st.write("Carregando CSV em memória...")
-    df = pd.read_csv("https://storage.googleapis.com/bigdataatividade/processed_data.csv")
+    df = pd.read_csv("/home/ubuntu/ProjetoDash/ProjetoDash/processed_data.csv")
     return df
 
+@st.cache_resource
 def load_model():
-    model_path = "evasion_model.joblib"
-    columns_path = "feature_columns.pkl"
-    model = joblib.load(model_path)
-    columns = joblib.load(columns_path)
-    return model, columns
+    model = joblib.load("/home/ubuntu/ProjetoDash/ProjetoDash/evasion_model.joblib")
+    return model
 
 # Carregar dados
 df = load_data()
-model, load_columns = load_model()
+model = load_model()
 
 # Sidebar para navegação
 st.sidebar.title("Navegação")
@@ -82,11 +42,7 @@ page = st.sidebar.selectbox("Escolha uma página:",
 
 if page == "Dashboard Principal":
     st.header("📊 Dashboard Principal")
-    st.write("Colunas no DataFrame:")
-    st.write(df.columns.tolist())
-    st.write("Primeiras linhas do DataFrame:")
-    st.write(df.head())
-
+    
     # Métricas principais
     col1, col2, col3, col4 = st.columns(4)
     
@@ -121,57 +77,42 @@ if page == "Dashboard Principal":
         fig_rede = px.pie(df, names="rede", values="alta_evasao",
                           title="Distribuição de Risco por Rede")
         st.plotly_chart(fig_rede, use_container_width=True)
-        # Botão para gerar PDF
-    st.markdown("### 📄 Gerar Relatório em PDF")
-
-    if st.button("Gerar Relatório"):
-        try:
-            gerar_pdf(df, fig_uf, fig_rede)
-            with open("relatorio_evasao.pdf", "rb") as f:
-                st.download_button("📥 Baixar PDF", f, file_name="relatorio_evasao.pdf", mime="application/pdf")
-        except Exception as e:
-            st.error(f"Erro ao gerar PDF: {str(e)}")
-    
 
 elif page == "Mapa de Risco":
     st.header("🗺️ Mapa de Escolas por Risco de Evasão")
     
-    # Verificar se há colunas de coordenadas
-    if "id_escola_latitude" in df.columns and "id_escola_longitude" in df.columns:
-        # Filtrar apenas escolas com alta evasão
-        df_risco = df[df["alta_evasao"] == 1]
-
-        # Mapa de dispersão geográfica
-        fig_map = px.scatter_mapbox(
-            df_risco,
-            lat="id_escola_latitude",
-            lon="id_escola_longitude",
-            color="taxa_evasao_historica",
-            size="taxa_evasao_historica",
-            hover_name="id_escola_nome" if "id_escola_nome" in df.columns else None,
-            hover_data=["sigla_uf", "id_municipio_nome", "taxa_evasao_historica"],
-            color_continuous_scale="Reds",
-            size_max=15,
-            zoom=3,
-            height=600,
-        )
-
-        fig_map.update_layout(mapbox_style="open-street-map")
-        fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-        
-        st.plotly_chart(fig_map, use_container_width=True)
-
-        st.subheader("Escolas com Alta Evasão")
-        st.dataframe(df_risco[["id_escola_nome", "sigla_uf", "id_municipio_nome", "taxa_evasao_historica"]])
-    else:
-        st.warning("Dados de latitude e longitude não encontrados.")
-
+    # Criar dados agregados por estado
+    df_estado = df.groupby("sigla_uf").agg({
+        "alta_evasao": "sum",
+        "taxa_evasao_historica": "mean",
+        "id_escola": "count"
+    }).reset_index()
+    df_estado.columns = ["Estado", "Escolas_Risco", "Taxa_Media_Evasao", "Total_Escolas"]
+    df_estado["Percentual_Risco"] = (df_estado["Escolas_Risco"] / df_estado["Total_Escolas"]) * 100
+    
+    # Mapa coroplético
+    fig_map = px.choropleth(
+        df_estado,
+        locations="Estado",
+        color="Percentual_Risco",
+        hover_name="Estado",
+        hover_data=["Escolas_Risco", "Total_Escolas", "Taxa_Media_Evasao"],
+        color_continuous_scale="Reds",
+        title="Percentual de Escolas em Risco por Estado",
+        locationmode="geojson-id"
+    )
+    
+    st.plotly_chart(fig_map, use_container_width=True)
+    
+    # Tabela de dados
+    st.subheader("Dados por Estado")
+    st.dataframe(df_estado.sort_values("Percentual_Risco", ascending=False))
 
 elif page == "Ranking de Fatores":
     st.header("📈 Ranking de Fatores Mais Influentes")
     
     # Análise de correlação
-    correlations = df[["ideb","nota_saeb_media_padronizada","nivel_socioeconomico", "taxa_evasao_historica", "alta_evasao"]].corr()["alta_evasao"].abs().sort_values(ascending=False)
+    correlations = df[["ideb", "nivel_socioeconomico", "taxa_evasao_historica"]].corr()["alta_evasao"].abs().sort_values(ascending=False)
     
     # Gráfico de barras
     fig_corr = px.bar(
@@ -182,7 +123,20 @@ elif page == "Ranking de Fatores":
     )
     st.plotly_chart(fig_corr, use_container_width=True)
     
+    # Análise detalhada
+    st.subheader("Análise Detalhada dos Fatores")
     
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        fig_ideb = px.box(df, x="alta_evasao", y="ideb", 
+                          title="Distribuição do IDEB por Risco de Evasão")
+        st.plotly_chart(fig_ideb, use_container_width=True)
+    
+    with col2:
+        fig_nse = px.box(df, x="alta_evasao", y="nivel_socioeconomico",
+                         title="Distribuição do Nível Socioeconômico por Risco de Evasão")
+        st.plotly_chart(fig_nse, use_container_width=True)
 
 elif page == "Comparativo Redes":
     st.header("🏫 Comparativo entre Redes (Pública/Privada)")
@@ -227,7 +181,7 @@ elif page == "Simulador de Cenários":
     
     with col1:
         ideb_sim = st.slider("IDEB", min_value=0.0, max_value=10.0, value=5.0, step=0.1)
-        nse_sim = st.slider("Nível Socioeconômico", min_value=10.0, max_value=70.0, value=50.0, step=1.0)
+        nse_sim = st.slider("Nível Socioeconômico", min_value=30.0, max_value=80.0, value=50.0, step=1.0)
     
     with col2:
         uf_sim = st.selectbox("Estado", df["sigla_uf"].unique())
@@ -235,37 +189,31 @@ elif page == "Simulador de Cenários":
     
     # Preparar dados para predição
     # Criar um dataframe com os valores simulados
-    # Criar o dataframe com os valores simulados
     sim_data = pd.DataFrame({
         "ideb": [ideb_sim],
         "nivel_socioeconomico": [nse_sim],
         "sigla_uf": [uf_sim],
         "rede": [rede_sim],
-        "taxa_evasao_historica": [df["taxa_evasao_historica"].mean()]
+        "taxa_evasao_historica": [df["taxa_evasao_historica"].mean()]  # Adicionar a coluna que estava faltando
     })
-
-    # Aplicar one-hot encoding
-    sim_encoded = pd.get_dummies(sim_data, columns=["sigla_uf", "rede"])
-
-    # Garantir que todas as colunas esperadas estejam presentes
-    for col in load_columns:
+    
+    # Aplicar one-hot encoding igual ao usado no treinamento
+    sim_encoded = pd.get_dummies(sim_data, columns=["sigla_uf", "rede"], drop_first=True)
+    
+    # Garantir que todas as colunas do modelo estejam presentes
+    # Recriar as colunas do modelo
+    df_encoded = pd.get_dummies(df[["ideb", "nivel_socioeconomico", "taxa_evasao_historica", "sigla_uf", "rede"]], 
+                                columns=["sigla_uf", "rede"], drop_first=True)
+    
+    for col in df_encoded.columns:
         if col not in sim_encoded.columns:
-            sim_encoded[col] = 0  # ou [0], ambos funcionam
-
-    # Reordenar as colunas
-    sim_encoded = sim_encoded[load_columns]
-
+            sim_encoded[col] = 0
+    
+    # Reordenar colunas para corresponder ao modelo
+    sim_encoded = sim_encoded[df_encoded.columns]
     
     # Fazer predição
     try:
-        st.write("Dados simulados:", sim_data)
-        st.write("Dados codificados:", sim_encoded)
-        st.write("🔥 Colunas ativadas (dummies = 1):", sim_encoded.loc[:, sim_encoded.iloc[0] == 1])
-        st.write("Proba completa:", model.predict_proba(sim_encoded))
-        st.write("Classe predita:", model.predict(sim_encoded))
-        st.write("Probabilidade (raw):", model.predict_proba(sim_encoded))
-
-
         probabilidade = model.predict_proba(sim_encoded)[0][1]
         risco = model.predict(sim_encoded)[0]
         
@@ -304,8 +252,6 @@ elif page == "Simulador de Cenários":
         
     except Exception as e:
         st.error(f"Erro na predição: {str(e)}")
-
-### Apartir daqui não tenho certeza mais de nada pode ser que funcione ou não.
 
 # Rodapé
 st.markdown("---")
