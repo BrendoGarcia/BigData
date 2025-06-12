@@ -61,7 +61,7 @@ st.markdown("---")
 @st.cache_data(show_spinner=True)
 def load_data():
     st.write("Carregando CSV em memória...")
-    df = pd.read_csv("https://storage.cloud.google.com/bigdataatividade/processed_data.csv")
+    df = pd.read_csv("https://storage.googleapis.com/bigdataatividade/processed_data.csv")
     return df
 
 def load_model():
